@@ -6,6 +6,7 @@ import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+@Entity
 @Table(name = "categorias")
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
