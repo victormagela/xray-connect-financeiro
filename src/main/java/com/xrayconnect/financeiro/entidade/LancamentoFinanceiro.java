@@ -119,4 +119,23 @@ public class LancamentoFinanceiro {
 
     @PreUpdate
     private void aoAtualizar() {this.atualizadoEm = LocalDateTime.now(ZoneOffset.UTC);}
+
+    public void liquidar(LocalDate dataLiquidacao) {
+        if (dataLiquidacao == null) {
+            throw new IllegalArgumentException("Data de liquidação não informada!");
+        }
+
+        if (this.situacaoLancamento != SituacaoLancamento.PENDENTE) {
+            throw new IllegalStateException(
+                "Lançamento não está pendente. Apenas lançamentos pendentes podem ser liquidados"
+            );
+        }
+
+        if (dataLiquidacao.isAfter(LocalDate.now())) {
+            throw new IllegalArgumentException("Data de liquidação não pode ser futura");
+        }
+
+        this.situacaoLancamento = SituacaoLancamento.LIQUIDADO;
+        this.dataLiquidacao = dataLiquidacao;
+    }
 }

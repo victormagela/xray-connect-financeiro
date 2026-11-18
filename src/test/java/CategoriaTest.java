@@ -1,5 +1,3 @@
-package com.xrayconnect.financeiro;
-
 import com.xrayconnect.financeiro.entidade.Categoria;
 import com.xrayconnect.financeiro.enumeracao.TipoLancamento;
 import org.junit.jupiter.api.Test;

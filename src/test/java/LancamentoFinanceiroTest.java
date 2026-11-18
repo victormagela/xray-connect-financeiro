@@ -98,4 +98,102 @@ public class LancamentoFinanceiroTest {
             );
         });
     }
+
+    @Test
+    public void dadoDataLiquidacaoValida_AoLiquidar_DeveMudarEstado() {
+        //Arrange
+        TipoLancamento tipo = TipoLancamento.DESPESA;
+        String descricao = "";
+        String nome = "Salários";
+        var categoria = new Categoria(nome, descricao, tipo);
+
+        String descricaoLancamento = "Pagamento da folha salarial do mês X";
+        String nomeContraparte = "";
+        var valor = new BigDecimal(50000);
+        var dataVencimento = LocalDate.of(2026, 11, 25);
+
+        var lancamento = new LancamentoFinanceiro(
+                categoria,
+                descricaoLancamento,
+                nomeContraparte,
+                valor,
+                tipo,
+                dataVencimento
+        );
+
+        var dataLiquidacao = LocalDate.now();
+
+        //Act
+        lancamento.liquidar(dataLiquidacao);
+
+        //Assert
+        assertEquals(SituacaoLancamento.LIQUIDADO, lancamento.getSituacaoLancamento());
+        assertEquals(dataLiquidacao, lancamento.getDataLiquidacao());
+    }
+
+    @Test
+    public void dadoLancamentoJaLiquidado_AoLiquidar_DeveLancarExcecao() {
+        //Arrange
+        TipoLancamento tipo = TipoLancamento.DESPESA;
+        String descricao = "";
+        String nome = "Salários";
+        var categoria = new Categoria(nome, descricao, tipo);
+
+        String descricaoLancamento = "Pagamento da folha salarial do mês X";
+        String nomeContraparte = "";
+        var valor = new BigDecimal(50000);
+        var dataVencimento = LocalDate.of(2026, 11, 25);
+
+        var lancamento = new LancamentoFinanceiro(
+                categoria,
+                descricaoLancamento,
+                nomeContraparte,
+                valor,
+                tipo,
+                dataVencimento
+        );
+
+        var dataLiquidacao = LocalDate.now();
+
+        lancamento.liquidar(dataLiquidacao);
+
+        //Act & Assert
+        assertThrows(IllegalStateException.class, () -> {
+            lancamento.liquidar(dataLiquidacao);
+        });
+        assertEquals(dataLiquidacao, lancamento.getDataLiquidacao());
+        assertEquals(SituacaoLancamento.LIQUIDADO, lancamento.getSituacaoLancamento());
+    }
+
+    @Test
+    public void dadoDataFutura_AoLiquidar_DeveLancarExcecao() {
+        //Arrange
+        TipoLancamento tipo = TipoLancamento.DESPESA;
+        String descricao = "";
+        String nome = "Salários";
+        var categoria = new Categoria(nome, descricao, tipo);
+
+        String descricaoLancamento = "Pagamento da folha salarial do mês X";
+        String nomeContraparte = "";
+        var valor = new BigDecimal(50000);
+        var dataVencimento = LocalDate.of(2026, 11, 25);
+
+        var lancamento = new LancamentoFinanceiro(
+                categoria,
+                descricaoLancamento,
+                nomeContraparte,
+                valor,
+                tipo,
+                dataVencimento
+        );
+
+        var dataLiquidacao = LocalDate.now().plusDays(1);
+
+        //Act & Assert
+        assertThrows(IllegalArgumentException.class, () -> {
+           lancamento.liquidar(dataLiquidacao);
+        });
+        assertNull(lancamento.getDataLiquidacao());
+        assertEquals(SituacaoLancamento.PENDENTE, lancamento.getSituacaoLancamento());
+    }
 }
