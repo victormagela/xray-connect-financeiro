@@ -7,6 +7,8 @@ import com.xrayconnect.financeiro.helper.MapeadorCategoria;
 import com.xrayconnect.financeiro.repositorio.CategoriaRepository;
 import com.xrayconnect.financeiro.repositorio.LancamentoFinanceiroRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -40,11 +42,9 @@ public class CategoriaService {
         return MapeadorCategoria.paraDtoResponse(categoria);
     }
 
-    public List<CategoriaResponse> listar() {
-        return categoriaRepository.findAll()
-                .stream()
-                .map(MapeadorCategoria::paraDtoResponse)
-                .toList();
+    public Page<CategoriaResponse> listar(Pageable pageble) {
+        return categoriaRepository.findAll(pageble)
+                .map(MapeadorCategoria::paraDtoResponse);
     }
 
     @Transactional
