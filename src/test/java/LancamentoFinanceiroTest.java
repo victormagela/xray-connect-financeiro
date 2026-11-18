@@ -196,4 +196,129 @@ public class LancamentoFinanceiroTest {
         assertNull(lancamento.getDataLiquidacao());
         assertEquals(SituacaoLancamento.PENDENTE, lancamento.getSituacaoLancamento());
     }
+
+    @Test
+    public void dadoDataReferenciaPosterior_AoVerificarVencimento_DeveRetornarTrue() {
+        //Arrange
+        TipoLancamento tipo = TipoLancamento.DESPESA;
+        String descricao = "";
+        String nome = "Salários";
+        var categoria = new Categoria(nome, descricao, tipo);
+
+        String descricaoLancamento = "Pagamento da folha salarial do mês X";
+        String nomeContraparte = "";
+        var valor = new BigDecimal(50000);
+        var dataVencimento = LocalDate.of(2026, 11, 25);
+
+        var lancamento = new LancamentoFinanceiro(
+                categoria,
+                descricaoLancamento,
+                nomeContraparte,
+                valor,
+                tipo,
+                dataVencimento
+        );
+
+        var dataReferencia = LocalDate.of(2026, 11, 30);
+
+        //Act
+        boolean estaVencida = lancamento.estaVencida(dataReferencia);
+
+        //Assert
+        assertTrue(estaVencida);
+    }
+
+    @Test
+    public void dadoLancamentoLiquidado_AoVerificarVencimento_DeveRetornarFalse() {
+        //Arrange
+        TipoLancamento tipo = TipoLancamento.DESPESA;
+        String descricao = "";
+        String nome = "Salários";
+        var categoria = new Categoria(nome, descricao, tipo);
+
+        String descricaoLancamento = "Pagamento da folha salarial do mês X";
+        String nomeContraparte = "";
+        var valor = new BigDecimal(50000);
+        var dataVencimento = LocalDate.of(2026, 11, 25);
+
+        var lancamento = new LancamentoFinanceiro(
+                categoria,
+                descricaoLancamento,
+                nomeContraparte,
+                valor,
+                tipo,
+                dataVencimento
+        );
+        lancamento.liquidar(LocalDate.now());
+
+        var dataReferencia = LocalDate.of(2026, 11, 30);
+
+        //Act
+        boolean estaVencida = lancamento.estaVencida(dataReferencia);
+
+        //Assert
+        assertFalse(estaVencida);
+    }
+
+    @Test
+    public void dadoDataReferenciaAnterior_AoVerificarVencimento_DeveRetornarFalse() {
+        //Arrange
+        TipoLancamento tipo = TipoLancamento.DESPESA;
+        String descricao = "";
+        String nome = "Salários";
+        var categoria = new Categoria(nome, descricao, tipo);
+
+        String descricaoLancamento = "Pagamento da folha salarial do mês X";
+        String nomeContraparte = "";
+        var valor = new BigDecimal(50000);
+        var dataVencimento = LocalDate.of(2026, 11, 25);
+
+        var lancamento = new LancamentoFinanceiro(
+                categoria,
+                descricaoLancamento,
+                nomeContraparte,
+                valor,
+                tipo,
+                dataVencimento
+        );
+
+        var dataReferencia = LocalDate.of(2026, 11, 24);
+
+        //Act
+        boolean estaVencida = lancamento.estaVencida(dataReferencia);
+
+        //Assert
+        assertFalse(estaVencida);
+    }
+
+    @Test
+    public void dadoDataReferenciaIgual_AoVerificarVencimento_DeveRetornarFalse() {
+        //Arrange
+        TipoLancamento tipo = TipoLancamento.DESPESA;
+        String descricao = "";
+        String nome = "Salários";
+        var categoria = new Categoria(nome, descricao, tipo);
+
+        String descricaoLancamento = "Pagamento da folha salarial do mês X";
+        String nomeContraparte = "";
+        var valor = new BigDecimal(50000);
+        var dataVencimento = LocalDate.of(2026, 11, 25);
+
+        var lancamento = new LancamentoFinanceiro(
+                categoria,
+                descricaoLancamento,
+                nomeContraparte,
+                valor,
+                tipo,
+                dataVencimento
+        );
+
+        var dataReferencia = dataVencimento;
+
+        //Act
+        boolean estaVencida = lancamento.estaVencida(dataReferencia);
+
+        //Assert
+        assertFalse(estaVencida);
+    }
 }

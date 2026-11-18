@@ -138,4 +138,12 @@ public class LancamentoFinanceiro {
         this.situacaoLancamento = SituacaoLancamento.LIQUIDADO;
         this.dataLiquidacao = dataLiquidacao;
     }
+
+    public boolean estaVencida(LocalDate dataReferencia) {
+     if (this.situacaoLancamento == SituacaoLancamento.PENDENTE && dataReferencia.isAfter(this.dataVencimento)) {
+         return true;
+     }
+
+     return false;
+    }
 }
