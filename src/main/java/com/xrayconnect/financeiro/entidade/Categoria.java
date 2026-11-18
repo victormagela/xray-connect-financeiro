@@ -31,13 +31,7 @@ public class Categoria {
             String descricao,
             TipoLancamento tipo
     ) {
-        if (!StringUtils.hasText(nome)) {
-            throw new IllegalArgumentException("Nome da categoria não informado");
-        }
-
-        if (tipo == null) {
-            throw new IllegalArgumentException("Tipo não informado!");
-        }
+        validarDados(nome, tipo);
 
         this.nome = nome;
         if (StringUtils.hasText(descricao)) {
@@ -46,5 +40,27 @@ public class Categoria {
             this.descricao = null;
         }
         this.tipo = tipo;
+    }
+
+    public void atualizar(String nome, String descricao, TipoLancamento tipo) {
+        validarDados(nome, tipo);
+
+        this.nome = nome;
+        if (StringUtils.hasText(descricao)) {
+            this.descricao = descricao;
+        } else {
+            this.descricao = null;
+        }
+        this.tipo = tipo;
+    }
+
+    private void validarDados(String nome, TipoLancamento tipo) {
+        if (!StringUtils.hasText(nome)) {
+            throw new IllegalArgumentException("Nome da categoria não informado");
+        }
+
+        if (tipo == null) {
+            throw new IllegalArgumentException("Tipo não informado!");
+        }
     }
 }
