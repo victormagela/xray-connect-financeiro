@@ -1,0 +1,41 @@
+### Cadastrar categoria
+POST http://localhost:8080/api/categorias
+Content-Type: application/json
+
+{
+  "nome": "Salários",
+  "descricao": "Pagamento de folha salarial",
+  "tipo": "DESPESA"
+}
+
+### Listar categorias
+GET http://localhost:8080/api/categorias?page=0&size=10
+
+### Buscar categoria por ID
+GET http://localhost:8080/api/categorias/1
+
+### Atualizar categoria
+PUT http://localhost:8080/api/categorias/1
+Content-Type: application/json
+
+{
+  "nome": "Comercialização de Equipamentos",
+  "descricao": "Receitas de vendas da X-Ray Connect",
+  "tipo": "RECEITA"
+}
+
+### Excluir categoria
+DELETE http://localhost:8080/api/categorias/2
+
+### Campos inválidos
+POST http://localhost:8080/api/categorias
+Content-Type: application/json
+
+{
+  "nome": "",
+  "descricao": "Teste de validação",
+  "tipo": null
+}
+
+### Categoria inexistente
+GET http://localhost:8080/api/categorias/999999
