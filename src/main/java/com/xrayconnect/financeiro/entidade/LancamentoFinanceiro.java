@@ -12,7 +12,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
-import java.util.Objects;
 
 @Entity
 @Table(name = "lancamentos_financeiros")
@@ -55,10 +54,6 @@ public class LancamentoFinanceiro {
 
     @Column(name = "atualizado_em", nullable = false)
     private LocalDateTime atualizadoEm;
-
-    @Version
-    @Column(name = "versao", nullable = false)
-    private Long versao;
 
     public LancamentoFinanceiro(
         Categoria categoria,
@@ -140,10 +135,6 @@ public class LancamentoFinanceiro {
     }
 
     public boolean estaVencida(LocalDate dataReferencia) {
-     if (this.situacaoLancamento == SituacaoLancamento.PENDENTE && dataReferencia.isAfter(this.dataVencimento)) {
-         return true;
-     }
-
-     return false;
+        return this.situacaoLancamento == SituacaoLancamento.PENDENTE && dataReferencia.isAfter(this.dataVencimento);
     }
 }
