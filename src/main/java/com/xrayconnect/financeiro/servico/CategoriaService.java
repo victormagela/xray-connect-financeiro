@@ -36,6 +36,7 @@ public class CategoriaService {
         return MapeadorCategoria.paraDtoResponse(categoria);
     }
 
+    @Transactional(readOnly = true)
     public CategoriaResponse buscarPorId(Long id) {
         var categoria = categoriaRepository.findById(id).
                 orElseThrow(() -> new RecursoNaoEncontradoException("Categoria não encontrada."));
@@ -43,6 +44,7 @@ public class CategoriaService {
         return MapeadorCategoria.paraDtoResponse(categoria);
     }
 
+    @Transactional(readOnly = true)
     public Page<CategoriaResponse> listar(Pageable pageble) {
         return categoriaRepository.findAll(pageble)
                 .map(MapeadorCategoria::paraDtoResponse);
