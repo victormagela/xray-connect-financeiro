@@ -63,32 +63,7 @@ public class LancamentoFinanceiro {
         TipoLancamento tipoLancamento,
         LocalDate dataVencimento
     ) {
-        if (categoria == null) {
-            throw new IllegalArgumentException("Categoria não informada!");
-        }
-
-        if (!StringUtils.hasText(descricao)) {
-            throw new IllegalArgumentException("Descrição não informada!");
-        }
-
-        if (valor == null) {
-            throw new IllegalArgumentException("Valor não informado!");
-        }
-        else if (valor.signum() <= 0) {
-            throw new IllegalArgumentException("Valor não pode ser negativo ou zero!");
-        }
-
-        if (tipoLancamento == null) {
-            throw new IllegalArgumentException("Tipo do lançamento não informado!");
-        }
-
-        if (categoria.getTipo() != tipoLancamento) {
-            throw new IllegalArgumentException("Tipo do lançamento informado não bate com o tipo da categoria informada!");
-        }
-
-        if (dataVencimento == null) {
-            throw new IllegalArgumentException("Data do vencimento não informada!");
-        }
+        validarDados(categoria, descricao, valor, tipoLancamento, dataVencimento);
 
         this.categoria = categoria;
         this.descricao = descricao;
@@ -136,5 +111,66 @@ public class LancamentoFinanceiro {
 
     public boolean estaVencida(LocalDate dataReferencia) {
         return this.situacaoLancamento == SituacaoLancamento.PENDENTE && dataReferencia.isAfter(this.dataVencimento);
+    }
+
+    public void atualizar(
+            Categoria categoria,
+            String descricao,
+            String nomeContraparte,
+            BigDecimal valor,
+            TipoLancamento tipoLancamento,
+            LocalDate dataVencimento
+    ) {
+        if (this.situacaoLancamento != SituacaoLancamento.PENDENTE) {
+            throw new IllegalStateException("Apenas lançamentos pendentes podem ser atualizados.");
+        }
+        validarDados(categoria, descricao, valor, tipoLancamento, dataVencimento);
+
+        this.categoria = categoria;
+        this.descricao = descricao;
+        if (StringUtils.hasText(nomeContraparte)) {
+            this.nomeContraparte = nomeContraparte;
+        }
+        else {
+            this.nomeContraparte = null;
+        }
+        this.valor = valor;
+        this.tipoLancamento = tipoLancamento;
+        this.dataVencimento = dataVencimento;
+    }
+
+    private void validarDados(
+            Categoria categoria,
+            String descricao,
+            BigDecimal valor,
+            TipoLancamento tipoLancamento,
+            LocalDate dataVencimento
+            ) {
+        if (categoria == null) {
+            throw new IllegalArgumentException("Categoria não informada!");
+        }
+
+        if (!StringUtils.hasText(descricao)) {
+            throw new IllegalArgumentException("Descrição não informada!");
+        }
+
+        if (valor == null) {
+            throw new IllegalArgumentException("Valor não informado!");
+        }
+        else if (valor.signum() <= 0) {
+            throw new IllegalArgumentException("Valor não pode ser negativo ou zero!");
+        }
+
+        if (tipoLancamento == null) {
+            throw new IllegalArgumentException("Tipo do lançamento não informado!");
+        }
+
+        if (categoria.getTipo() != tipoLancamento) {
+            throw new IllegalArgumentException("Tipo do lançamento informado não bate com o tipo da categoria informada!");
+        }
+
+        if (dataVencimento == null) {
+            throw new IllegalArgumentException("Data do vencimento não informada!");
+        }
     }
 }
