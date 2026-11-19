@@ -2,6 +2,7 @@ package com.xrayconnect.financeiro.entidade;
 
 import com.xrayconnect.financeiro.enumeracao.SituacaoLancamento;
 import com.xrayconnect.financeiro.enumeracao.TipoLancamento;
+import com.xrayconnect.financeiro.exception.ConflitoNegocioException;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -96,7 +97,7 @@ public class LancamentoFinanceiro {
         }
 
         if (this.situacaoLancamento != SituacaoLancamento.PENDENTE) {
-            throw new IllegalStateException(
+            throw new ConflitoNegocioException(
                 "Lançamento não está pendente. Apenas lançamentos pendentes podem ser liquidados"
             );
         }
@@ -122,7 +123,7 @@ public class LancamentoFinanceiro {
             LocalDate dataVencimento
     ) {
         if (this.situacaoLancamento != SituacaoLancamento.PENDENTE) {
-            throw new IllegalStateException("Apenas lançamentos pendentes podem ser atualizados.");
+            throw new ConflitoNegocioException("Apenas lançamentos pendentes podem ser atualizados.");
         }
         validarDados(categoria, descricao, valor, tipoLancamento, dataVencimento);
 
