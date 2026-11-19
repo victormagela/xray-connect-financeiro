@@ -11,7 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("api/categorias")
+@RequestMapping("/api/categorias")
 @RequiredArgsConstructor
 public class CategoriaController {
 
@@ -33,12 +33,12 @@ public class CategoriaController {
         return servicoCategoria.buscarPorId(id);
     }
 
-    @PutMapping("{id}")
+    @PutMapping("/{id}")
     public CategoriaResponse putCategoria(@PathVariable Long id, @RequestBody @Valid CategoriaRequest dados) {
         return servicoCategoria.atualizarCategoria(id, dados);
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void deleteCategoria(@PathVariable Long id) {
         servicoCategoria.excluirCategoria(id);
