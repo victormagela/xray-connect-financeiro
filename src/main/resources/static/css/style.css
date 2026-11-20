@@ -201,3 +201,90 @@ h1 { margin: 0; font-size: clamp(25px, 2.6vw, 34px); font-weight: 750; letter-sp
   .dashboard-toolbar { align-items: flex-start; flex-direction: column; }
   .dashboard-shortcuts { grid-template-columns: 1fr 1fr; }
 }
+
+/* Contas a receber / Contas a pagar — mesma view, duas rotas */
+.lf-page { display: grid; gap: 18px; }
+.lf-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 18px; }
+.lf-eyebrow { margin: 0 0 7px; font-size: 10px; font-weight: 800; letter-spacing: .14em; color: var(--red); }
+.lf-toolbar-description { margin: 0; font-size: 12px; line-height: 1.6; color: var(--grey-700); }
+.lf-panel-header { flex-wrap: wrap; gap: 14px; }
+.lf-controls { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+.lf-controls label { color: var(--grey-700); font-size: 11px; font-weight: 600; }
+.lf-controls select { max-width: 240px; min-height: 36px; border-radius: 7px; border: 1px solid var(--grey-300); padding: 7px 10px; color: var(--grey-900); background: white; font-size: 12px; }
+.lf-button-small { min-height: 36px; padding: 8px 12px; }
+.lf-button-small:disabled, .lf-dialog-actions .button:disabled { opacity: .47; cursor: not-allowed; }
+.lf-button-small:disabled:hover { background: white; }
+.lf-table { min-width: 930px; }
+.lf-table tbody td { vertical-align: middle; padding-top: 15px; padding-bottom: 15px; }
+.lf-table tbody td:first-child { min-width: 208px; }
+.lf-description { display: block; max-width: 260px; color: var(--grey-900); font-size: 12px; font-weight: 680; line-height: 1.45; overflow-wrap: anywhere; }
+.lf-secondary { display: block; margin-top: 5px; color: var(--grey-500); font-size: 11px; line-height: 1.4; overflow-wrap: anywhere; }
+.lf-amount { color: var(--grey-900) !important; white-space: nowrap; font-weight: 720; font-variant-numeric: tabular-nums; }
+.lf-status { display: inline-flex; border-radius: 40px; padding: 6px 10px; font-weight: 680; font-size: 10px; white-space: nowrap; }
+.lf-status-pendente { background: #f0f0f2; color: #565b63; }
+.lf-status-vencido { background: #fff0f0; color: #bd2828; }
+.lf-status-liquidado { background: #e7e7e9; color: #202020; }
+.lf-row-actions { display: flex; gap: 6px; align-items: center; flex-wrap: wrap; min-width: 190px; }
+.lf-action { border: 1px solid var(--grey-300); background: #fff; color: var(--grey-900); padding: 7px 9px; border-radius: 6px; font-size: 11px; font-weight: 640; }
+.lf-action:hover { background: var(--grey-100); }
+.lf-action-primary { color: #fff; border-color: var(--black); background: var(--black); }
+.lf-action-primary:hover { background: #3b3b3b; }
+.lf-action-danger { border-color: #f2cccc; color: var(--red); }
+.lf-action-danger:hover { background: var(--red-light); }
+.lf-no-actions { color: var(--grey-500); font-size: 11px; }
+.lf-pagination { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 15px 21px; border-top: 1px solid var(--grey-200); }
+.lf-page-info, .lf-footnote { font-size: 11px; line-height: 1.6; color: var(--grey-500); }
+.lf-page-buttons { display: flex; align-items: center; gap: 8px; }
+.lf-footnote { margin: 0 2px 2px; }
+.lf-feedback { white-space: pre-line; font-size: 12px; line-height: 1.55; padding: 11px 13px; border-radius: 8px; }
+.lf-feedback[hidden], .lf-field-error[hidden], .lf-help[hidden] { display: none; }
+.lf-feedback-error { border: 1px solid #eebbbb; background: var(--red-light); color: #952525; }
+.lf-feedback-success { border: 1px solid #d0d0d0; background: #eeeeef; color: #222; }
+
+/* Formulários modais nativos (<dialog>), sem biblioteca JS. */
+.lf-dialog { width: min(560px, calc(100vw - 28px)); max-height: min(90vh, 850px); overflow-y: auto; border: 1px solid var(--grey-300); border-radius: 15px; padding: 0; margin: auto; background: white; color: var(--grey-900); box-shadow: 0 22px 75px rgba(0,0,0,.3); }
+.lf-dialog::backdrop { background: rgba(15,15,15,.67); backdrop-filter: blur(2px); }
+.lf-dialog-small { width: min(460px, calc(100vw - 28px)); }
+.lf-dialog form { margin: 0; }
+.lf-dialog-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; border-bottom: 1px solid var(--grey-200); padding: 22px 25px 18px; }
+.lf-dialog-header h2 { margin: 0; font-size: 19px; letter-spacing: -.03em; }
+.lf-dialog-header .lf-eyebrow { margin-bottom: 7px; }
+.lf-close { border: 0; border-radius: 7px; background: var(--grey-100); font-size: 26px; line-height: 1; width: 32px; height: 32px; display: grid; place-items: center; color: var(--grey-700); }
+.lf-close:hover { background: var(--grey-200); }
+.lf-dialog-body { display: grid; gap: 16px; padding: 23px 25px 24px; }
+.lf-field { display: grid; gap: 7px; min-width: 0; }
+.lf-field label { color: var(--grey-900); font-weight: 700; font-size: 12px; }
+.lf-field label span { color: var(--red); }
+.lf-field input, .lf-field select { width: 100%; min-height: 41px; padding: 10px 12px; background: #fff; color: var(--grey-900); border: 1px solid var(--grey-300); border-radius: 8px; font-size: 13px; }
+.lf-field input:disabled, .lf-field select:disabled { background: var(--grey-100); color: var(--grey-500); }
+.lf-field input::placeholder { color: #9da1a8; }
+.lf-field-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 14px; }
+.lf-field-error { color: var(--red); font-size: 11px; }
+.lf-help { margin: 0; font-size: 11px; line-height: 1.55; color: var(--grey-500); }
+.lf-help a { color: var(--red); text-decoration: underline; text-underline-offset: 2px; }
+.lf-settlement-description { font-size: 13px; line-height: 1.55; color: var(--grey-700); margin: 0; overflow-wrap: anywhere; }
+.lf-dialog-actions { display: flex; justify-content: flex-end; flex-wrap: wrap; gap: 10px; padding: 17px 25px 22px; border-top: 1px solid var(--grey-200); }
+
+@media (max-width: 660px) {
+  .lf-toolbar { flex-direction: column; align-items: stretch; }
+  .lf-toolbar > .button { align-self: flex-start; }
+  .lf-controls { width: 100%; }
+  .lf-controls select { flex: 1; max-width: none; min-width: 160px; }
+  .lf-dialog-header, .lf-dialog-body, .lf-dialog-actions { padding-left: 18px; padding-right: 18px; }
+  .lf-field-grid { grid-template-columns: 1fr; }
+}
+
+
+/* Categorias — mantém os padrões visuais e componentes das telas financeiras. */
+.cat-page { display: grid; gap: 18px; }
+.cat-table { min-width: 675px; }
+.cat-table tbody td { vertical-align: middle; padding-top: 16px; padding-bottom: 16px; }
+.cat-table tbody td:first-child { width: 29%; }
+.cat-table tbody td:last-child { width: 180px; }
+.cat-description { max-width: 420px; overflow-wrap: anywhere; line-height: 1.55; }
+.cat-type { display: inline-flex; align-items: center; border-radius: 30px; padding: 7px 11px; font-size: 10px; font-weight: 750; white-space: nowrap; }
+.cat-type-receita { color: #343434; background: #ebebed; }
+.cat-type-despesa { color: #a71e1e; background: #fff0f0; }
+.cat-dialog .lf-field textarea { width: 100%; resize: vertical; min-height: 95px; padding: 10px 12px; background: white; color: var(--grey-900); border: 1px solid var(--grey-300); border-radius: 8px; font-size: 13px; line-height: 1.6; }
+.cat-dialog .lf-field textarea::placeholder { color: #9da1a8; }
+.cat-dialog .lf-field textarea:focus-visible { outline: 3px solid rgba(198, 40, 40, 0.35); outline-offset: 3px; }

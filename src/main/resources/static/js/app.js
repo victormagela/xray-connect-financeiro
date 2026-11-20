@@ -1,5 +1,7 @@
-/** X-Ray Connect — navegação da SPA. Dashboard conectado à API. */
+/** X-Ray Connect — navegação da SPA. Views conectadas à API. */
 import { renderDashboard, inicializarDashboard } from './views/dashboard.js';
+import { renderLancamentos, inicializarLancamentos } from './views/lancamentos.js';
+import { renderCategorias, inicializarCategorias } from './views/categorias.js';
 
 const ICONS = {
   dashboard: '<svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg>',
@@ -41,56 +43,6 @@ function painel(titulo, subtitulo, conteudo, etiqueta = '') {
   `;
 }
 
-function renderLancamentos(tipo) {
-  const receita = tipo === 'RECEITA';
-  const nome = receita ? 'Contas a receber' : 'Contas a pagar';
-  return `
-    ${avisoIntegracao('O cadastro, a edição, a exclusão, a liquidação e a paginação serão conectados nesta tela na próxima etapa.')}
-    <div class="card-stack">
-      <div class="route-banner">
-        <strong>${nome}</strong>
-        <p>Esta tela consultará os lançamentos do tipo ${tipo}, já filtrados e paginados pelo back-end.</p>
-        <code>GET /api/lancamentos?tipo=${tipo}&amp;page=0&amp;size=10</code>
-      </div>
-      <section class="panel">
-        <div class="panel-header">
-          <div><h2 class="panel-title">Lançamentos financeiros</h2><p class="panel-subtitle">Cadastro, situação, vencimentos e ações</p></div>
-          <span class="pill red">${tipo}</span>
-        </div>
-        <div class="table-wrap">
-          <table class="data-table">
-            <thead><tr><th>Descrição</th><th>Categoria</th><th>Valor</th><th>Vencimento</th><th>Situação</th><th>Ações</th></tr></thead>
-            <tbody><tr><td colspan="6" class="empty-table">Tabela aguardando conexão com a API.<br>Os lançamentos existentes serão exibidos aqui.</td></tr></tbody>
-          </table>
-        </div>
-      </section>
-    </div>
-  `;
-}
-
-function renderCategorias() {
-  return `
-    ${avisoIntegracao('Os formulários de cadastro e edição, as ações de exclusão e a paginação serão adicionados durante a integração.')}
-    <div class="route-banner">
-      <strong>Gerenciamento de categorias</strong>
-      <p>As categorias organizam receitas e despesas e são compartilhadas com as telas de lançamentos.</p>
-      <code>GET /api/categorias?page=0&amp;size=10</code>
-    </div>
-    <div style="height:20px"></div>
-    <section class="panel">
-      <div class="panel-header">
-        <div><h2 class="panel-title">Categorias cadastradas</h2><p class="panel-subtitle">Lista de categorias financeiras</p></div>
-      </div>
-      <div class="table-wrap">
-        <table class="data-table">
-          <thead><tr><th>Nome</th><th>Tipo</th><th>Descrição</th><th>Ações</th></tr></thead>
-          <tbody><tr><td colspan="4" class="empty-table">Tabela aguardando conexão com a API de categorias.</td></tr></tbody>
-        </table>
-      </div>
-    </section>
-  `;
-}
-
 function renderFluxoCaixa() {
   return `
     ${avisoIntegracao('O seletor de período, os totais e o gráfico mensal serão conectados ao endpoint de fluxo de caixa.')}
@@ -107,10 +59,10 @@ function renderFluxoCaixa() {
 
 const rotas = {
   dashboard: { titulo: 'Dashboard financeiro', kicker: 'VISÃO GERAL', descricao: 'Acompanhe os principais indicadores financeiros da X-Ray Connect.', render: renderDashboard, inicializar: inicializarDashboard },
-  receber: { titulo: 'Contas a receber', kicker: 'GESTÃO DE RECEITAS', descricao: 'Gerencie vendas e outros valores que a empresa tem a receber.', render: () => renderLancamentos('RECEITA') },
-  pagar: { titulo: 'Contas a pagar', kicker: 'GESTÃO DE DESPESAS', descricao: 'Acompanhe as obrigações e os pagamentos da empresa.', render: () => renderLancamentos('DESPESA') },
+  receber: { titulo: 'Contas a receber', kicker: 'GESTÃO DE RECEITAS', descricao: 'Gerencie vendas e outros valores que a empresa tem a receber.', render: () => renderLancamentos('RECEITA'), inicializar: conteudo => inicializarLancamentos(conteudo, 'RECEITA') },
+  pagar: { titulo: 'Contas a pagar', kicker: 'GESTÃO DE DESPESAS', descricao: 'Acompanhe as obrigações e os pagamentos da empresa.', render: () => renderLancamentos('DESPESA'), inicializar: conteudo => inicializarLancamentos(conteudo, 'DESPESA') },
   'fluxo-caixa': { titulo: 'Fluxo de caixa', kicker: 'RELATÓRIOS', descricao: 'Consulte as entradas, saídas e o saldo realizado por período.', render: renderFluxoCaixa },
-  categorias: { titulo: 'Categorias', kicker: 'CONFIGURAÇÕES', descricao: 'Organize e classifique os lançamentos financeiros.', render: renderCategorias },
+  categorias: { titulo: 'Categorias', kicker: 'CONFIGURAÇÕES', descricao: 'Organize e classifique os lançamentos financeiros.', render: renderCategorias, inicializar: inicializarCategorias },
 };
 
 function navegar() {
