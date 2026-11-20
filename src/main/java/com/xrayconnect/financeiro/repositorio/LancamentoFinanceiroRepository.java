@@ -4,6 +4,9 @@ import com.xrayconnect.financeiro.dto.MovimentacaoDiaria;
 import com.xrayconnect.financeiro.dto.TotalPorTipoESituacao;
 import com.xrayconnect.financeiro.entidade.LancamentoFinanceiro;
 import com.xrayconnect.financeiro.enumeracao.SituacaoLancamento;
+import com.xrayconnect.financeiro.enumeracao.TipoLancamento;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -14,6 +17,11 @@ import java.util.List;
 public interface LancamentoFinanceiroRepository extends JpaRepository<LancamentoFinanceiro, Long> {
 
     boolean existsByCategoria_Id(Long categoriaId);
+
+    Page<LancamentoFinanceiro> findByTipoLancamento(
+            TipoLancamento tipo,
+            Pageable pageable
+    );
 
     @Query("""
             SELECT new com.xrayconnect.financeiro.dto.TotalPorTipoESituacao(

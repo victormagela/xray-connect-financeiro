@@ -4,6 +4,7 @@ import com.xrayconnect.financeiro.dto.LancamentoFinanceiroRequest;
 import com.xrayconnect.financeiro.dto.LancamentoFinanceiroResponse;
 import com.xrayconnect.financeiro.entidade.LancamentoFinanceiro;
 import com.xrayconnect.financeiro.enumeracao.SituacaoLancamento;
+import com.xrayconnect.financeiro.enumeracao.TipoLancamento;
 import com.xrayconnect.financeiro.exception.ConflitoNegocioException;
 import com.xrayconnect.financeiro.exception.RecursoNaoEncontradoException;
 import com.xrayconnect.financeiro.helper.MapeadorLancamentoFinanceiro;
@@ -50,9 +51,23 @@ public class LancamentoFinanceiroService {
     }
 
     @Transactional(readOnly = true)
-    public Page<LancamentoFinanceiroResponse> listar(Pageable pageable) {
-        return lancamentoFinanceiroRepository.findAll(pageable)
-                .map(MapeadorLancamentoFinanceiro::paraDtoResponse);
+    public Page<LancamentoFinanceiroResponse> listar(
+            Pageable pageable,
+            TipoLancamento tipo
+    ) {
+        Page<LancamentoFinanceiro> lancamentos;
+
+        if (tipo != null) {
+            lancamentos = lancamentoFinanceiroRepository
+                    .findByTipoLancamento(tipo, pageable);
+        } else {
+            lancamentos = lancamentoFinanceiroRepository
+                    .findAll(pageable);
+        }
+
+        return lancamentos.map(
+                MapeadorLancamentoFinanceiro::paraDtoResponse
+        );
     }
 
     @Transactional

@@ -3,6 +3,7 @@ package com.xrayconnect.financeiro.controller;
 import com.xrayconnect.financeiro.dto.LancamentoFinanceiroRequest;
 import com.xrayconnect.financeiro.dto.LancamentoFinanceiroResponse;
 import com.xrayconnect.financeiro.dto.LiquidacaoRequest;
+import com.xrayconnect.financeiro.enumeracao.TipoLancamento;
 import com.xrayconnect.financeiro.servico.LancamentoFinanceiroService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -25,8 +26,11 @@ public class LancamentoFinanceiroController {
     }
 
     @GetMapping
-    public Page<LancamentoFinanceiroResponse> getAllLancamento(Pageable pageable) {
-        return lancamentoFinanceiroService.listar(pageable);
+    public Page<LancamentoFinanceiroResponse> getAllLancamento(
+            Pageable pageable,
+            @RequestParam(required = false) TipoLancamento tipo
+    ) {
+        return lancamentoFinanceiroService.listar(pageable, tipo);
     }
 
     @GetMapping("/{id}")

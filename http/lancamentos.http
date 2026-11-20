@@ -247,3 +247,22 @@ Accept: application/json
         client.assert(response.status === 404, "Esperado 404, recebido " + response.status);
     });
 %}
+
+### Listar apenas receitas
+GET http://localhost:8080/api/lancamentos?tipo=RECEITA&page=0&size=10
+Accept: application/json
+
+
+### Listar apenas despesas
+GET http://localhost:8080/api/lancamentos?tipo=DESPESA&page=0&size=10
+Accept: application/json
+
+
+### Listar todos os lançamentos
+GET http://localhost:8080/api/lancamentos?page=0&size=10
+Accept: application/json
+
+
+### Listar receitas ordenadas por vencimento
+GET http://localhost:8080/api/lancamentos?tipo=RECEITA&page=0&size=10&sort=dataVencimento,asc
+Accept: application/json
