@@ -288,3 +288,44 @@ h1 { margin: 0; font-size: clamp(25px, 2.6vw, 34px); font-weight: 750; letter-sp
 .cat-dialog .lf-field textarea { width: 100%; resize: vertical; min-height: 95px; padding: 10px 12px; background: white; color: var(--grey-900); border: 1px solid var(--grey-300); border-radius: 8px; font-size: 13px; line-height: 1.6; }
 .cat-dialog .lf-field textarea::placeholder { color: #9da1a8; }
 .cat-dialog .lf-field textarea:focus-visible { outline: 3px solid rgba(198, 40, 40, 0.35); outline-offset: 3px; }
+
+
+/* Fluxo de Caixa: filtros, gráfico adaptável e tabela mensal. */
+.fc-page { display: grid; gap: 20px; }
+.fc-filters .panel-content { padding-top: 20px; padding-bottom: 18px; }
+.fc-filter-form { display: flex; align-items: flex-end; flex-wrap: wrap; gap: 14px; }
+.fc-filter-form .lf-field { flex: 1 1 210px; max-width: 350px; }
+.fc-filter-form .lf-field input { min-width: 0; }
+.fc-apply { min-height: 41px; white-space: nowrap; }
+.fc-presets { display: flex; align-items: center; flex-wrap: wrap; gap: 9px; margin-top: 16px; }
+.fc-presets > span { font-size: 11px; color: var(--grey-500); font-weight: 650; margin-right: 2px; }
+.fc-preset { background: var(--grey-100); color: var(--grey-900); border: 1px solid var(--grey-200); border-radius: 7px; font-size: 11px; font-weight: 650; padding: 8px 12px; }
+.fc-preset:hover { background: var(--grey-200); }
+.fc-metrics { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-bottom: 0; }
+.fc-metrics .metric-card { min-height: 135px; }
+.fc-metrics .metric-number { margin: 16px 0 6px; }
+.fc-panel-header { flex-wrap: wrap; }
+.fc-chart-region { min-height: 225px; }
+.fc-chart-scroll { overflow-x: auto; padding-bottom: 7px; scrollbar-width: thin; }
+.fc-chart-plot { display: flex; width: 100%; height: 210px; border-bottom: 1px solid var(--grey-200); }
+.fc-chart-column { min-width: 0; flex: 1 1 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: stretch; }
+.fc-bars { min-height: 0; height: 174px; display: flex; justify-content: center; gap: 9px; align-items: flex-end; border-bottom: 1px solid var(--grey-300); }
+.fc-bars .chart-bar { flex: none; width: 23px; max-width: 28%; }
+.fc-chart-month { min-height: 33px; display: grid; place-items: center; font-size: 10px; color: var(--grey-700); white-space: nowrap; }
+.fc-table { min-width: 550px; }
+.fc-table tbody th { padding: 16px 20px; font-size: 12px; text-align: left; font-weight: 700; border-bottom: 1px solid var(--grey-200); }
+.fc-table tbody tr:last-child th { border-bottom: 0; }
+.fc-table tbody td { padding-top: 16px; padding-bottom: 16px; }
+.fc-table .fc-money { font-variant-numeric: tabular-nums; white-space: nowrap; color: var(--grey-900); font-weight: 650; }
+.fc-negative { color: var(--red) !important; }
+.fc-page > .lf-feedback[hidden] { display: none; }
+@media (max-width: 900px) {
+  .fc-metrics { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fc-metrics .metric-card:last-child { grid-column: 1 / -1; }
+}
+@media (max-width: 600px) {
+  .fc-metrics { grid-template-columns: 1fr; }
+  .fc-metrics .metric-card:last-child { grid-column: auto; }
+  .fc-filter-form .lf-field { flex-basis: 100%; max-width: none; }
+  .fc-apply { width: 100%; }
+}
