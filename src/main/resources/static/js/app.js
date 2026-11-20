@@ -1,8 +1,5 @@
-/**
- * X-Ray Connect — navegação inicial da SPA (sem frameworks).
- * Nesta etapa, os cinco destinos são placeholders; nenhum valor fictício é exibido.
- * Na próxima etapa, conectaremos as views aos endpoints do Spring Boot.
- */
+/** X-Ray Connect — navegação da SPA. Dashboard conectado à API. */
+import { renderDashboard, inicializarDashboard } from './views/dashboard.js';
 
 const ICONS = {
   dashboard: '<svg class="icon" aria-hidden="true"><use href="#i-grid"/></svg>',
@@ -41,45 +38,6 @@ function painel(titulo, subtitulo, conteudo, etiqueta = '') {
       </div>
       <div class="panel-content">${conteudo}</div>
     </section>
-  `;
-}
-
-function renderDashboard() {
-  const indicadores = [
-    ['Total a receber', 'Receitas pendentes', true],
-    ['Total a pagar', 'Despesas pendentes', false],
-    ['Saldo realizado', 'Recebido menos pago', true],
-    ['Contas vencidas', 'Pendentes após o vencimento', false],
-  ];
-
-  return `
-    ${avisoIntegracao('Os indicadores serão obtidos de GET /api/relatorios/dashboard. Não exibimos números inventados antes da integração.')}
-    <section class="metric-grid" aria-label="Indicadores financeiros">
-      ${indicadores.map(([titulo, descricao, destaque]) => `
-        <article class="metric-card ${destaque ? 'accent' : ''}">
-          <div class="metric-label">${titulo}</div>
-          <div class="metric-number" aria-label="Aguardando dados">—</div>
-          <p class="metric-note">${descricao}</p>
-        </article>
-      `).join('')}
-    </section>
-    <div class="dashboard-columns">
-      ${painel('Movimentação financeira', 'Visão mensal de receitas e despesas', vazio('Gráfico ainda não conectado', 'A visualização será alimentada por GET /api/relatorios/fluxo-caixa.'))}
-      ${painel('Atalhos do módulo', 'Acesse as áreas operacionais', `
-        <div class="actions-row">
-          <a class="button primary" href="#receber">Contas a receber</a>
-          <a class="button" href="#pagar">Contas a pagar</a>
-          <a class="button" href="#fluxo-caixa">Fluxo de caixa</a>
-          <a class="button" href="#categorias">Categorias</a>
-        </div>
-        <div style="height:22px"></div>
-        <div class="info-list">
-          <div class="info-list-row"><span>API</span><strong>Spring Boot</strong></div>
-          <div class="info-list-row"><span>Banco de dados</span><strong>MySQL</strong></div>
-          <div class="info-list-row"><span>Interface</span><strong>HTML, CSS e JS</strong></div>
-        </div>
-      `)}
-    </div>
   `;
 }
 
@@ -148,7 +106,7 @@ function renderFluxoCaixa() {
 }
 
 const rotas = {
-  dashboard: { titulo: 'Dashboard financeiro', kicker: 'VISÃO GERAL', descricao: 'Acompanhe os principais indicadores financeiros da X-Ray Connect.', render: renderDashboard },
+  dashboard: { titulo: 'Dashboard financeiro', kicker: 'VISÃO GERAL', descricao: 'Acompanhe os principais indicadores financeiros da X-Ray Connect.', render: renderDashboard, inicializar: inicializarDashboard },
   receber: { titulo: 'Contas a receber', kicker: 'GESTÃO DE RECEITAS', descricao: 'Gerencie vendas e outros valores que a empresa tem a receber.', render: () => renderLancamentos('RECEITA') },
   pagar: { titulo: 'Contas a pagar', kicker: 'GESTÃO DE DESPESAS', descricao: 'Acompanhe as obrigações e os pagamentos da empresa.', render: () => renderLancamentos('DESPESA') },
   'fluxo-caixa': { titulo: 'Fluxo de caixa', kicker: 'RELATÓRIOS', descricao: 'Consulte as entradas, saídas e o saldo realizado por período.', render: renderFluxoCaixa },
@@ -167,7 +125,9 @@ function navegar() {
   document.getElementById('page-title').textContent = rota.titulo;
   document.getElementById('page-kicker').textContent = rota.kicker;
   document.getElementById('page-subtitle').textContent = rota.descricao;
-  document.getElementById('view-content').innerHTML = rota.render();
+  const conteudo = document.getElementById('view-content');
+  conteudo.innerHTML = rota.render();
+  rota.inicializar?.(conteudo);
 
   document.querySelectorAll('.nav-link').forEach(link => {
     const ativo = link.dataset.view === identificador;

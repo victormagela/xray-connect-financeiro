@@ -165,3 +165,39 @@ h1 { margin: 0; font-size: clamp(25px, 2.6vw, 34px); font-weight: 750; letter-sp
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition-duration: 0.01ms !important; }
 }
+
+
+/* Dashboard conectado ao back-end — preto, vermelho e cinza */
+.dashboard-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin: -4px 0 18px; }
+.dashboard-toolbar p { color: var(--grey-700); font-size: 12px; margin: 0; line-height: 1.6; }
+.dashboard-refresh { white-space: nowrap; flex: none; }
+.dashboard-refresh:disabled { opacity: .65; cursor: wait; }
+.metric-number.is-negative { color: var(--red); }
+.dashboard-chart-content { min-height: 298px; }
+.chart-legend { display: flex; gap: 18px; flex-wrap: wrap; color: var(--grey-700); font-size: 11px; font-weight: 600; margin: 1px 0 22px; }
+.chart-legend span { display: inline-flex; align-items: center; gap: 8px; }
+.chart-key { display: inline-block; width: 11px; height: 11px; border-radius: 3px; }
+.chart-key.receita, .chart-bar.receita { background: var(--grey-900); }
+.chart-key.despesa, .chart-bar.despesa { background: var(--red); }
+.chart-scroll { overflow-x: auto; padding-bottom: 3px; }
+.chart-plot { height: 212px; display: grid; grid-template-columns: repeat(6, minmax(47px, 1fr)); gap: 12px; min-width: 320px; border-bottom: 1px solid var(--grey-200); }
+.chart-column { display: flex; flex-direction: column; align-items: stretch; justify-content: flex-end; min-width: 0; }
+.chart-bars { height: 178px; display: flex; justify-content: center; align-items: flex-end; gap: 7px; border-bottom: 1px solid var(--grey-300); }
+.chart-bar { width: min(22px, 38%); border-radius: 4px 4px 0 0; transition: height .2s ease; min-height: 0; }
+.chart-month { height: 31px; display: grid; place-items: center; color: var(--grey-700); font-size: 10px; white-space: nowrap; }
+.dashboard-summary .info-list-row { align-items: baseline; }
+.dashboard-summary .info-list-row strong { font-size: 16px; color: var(--black); font-variant-numeric: tabular-nums; }
+.dashboard-help { color: var(--grey-500); background: var(--grey-100); border-radius: 8px; padding: 11px 12px; font-size: 11px; line-height: 1.55; margin: 21px 0; }
+.dashboard-shortcuts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+.dashboard-shortcuts h3 { grid-column: 1 / -1; font-size: 12px; margin: 4px 0 2px; }
+.dashboard-shortcuts .button { text-align: center; padding: 10px 8px; font-size: 11px; }
+.dashboard-loading, .dashboard-empty, .dashboard-error { color: var(--grey-700); font-size: 12px; line-height: 1.6; }
+.dashboard-loading, .dashboard-empty { min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.dashboard-empty strong { color: var(--grey-900); font-size: 13px; }
+.dashboard-empty p { color: var(--grey-500); margin: 9px 0 0; max-width: 300px; }
+.dashboard-error { border: 1px solid #efcaca; background: var(--red-light); border-radius: 8px; color: #932525; padding: 12px 14px; }
+.metric-grid > .dashboard-error { grid-column: 1 / -1; }
+@media (max-width: 700px) {
+  .dashboard-toolbar { align-items: flex-start; flex-direction: column; }
+  .dashboard-shortcuts { grid-template-columns: 1fr 1fr; }
+}
