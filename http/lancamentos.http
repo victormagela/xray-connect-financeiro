@@ -1,0 +1,249 @@
+# X-Ray Connect — testes manuais/semiautomatizados do CRUD financeiro
+# Execute os blocos NA ORDEM, clicando no ícone de execução de cada requisição.
+# O IntelliJ guarda automaticamente os IDs das respostas para as próximas requisições.
+# A cada nova execução das duas primeiras requisições, são criadas categorias de teste novas.
+# Requer a aplicação em http://localhost:8080 e CategoriaController funcional.
+
+@baseUrl = http://localhost:8080
+
+### 00A — Preparação: criar categoria de RECEITA (201)
+POST {{baseUrl}}/api/categorias
+Content-Type: application/json
+Accept: application/json
+
+{
+  "nome": "Receita Teste {{$uuid}}",
+  "descricao": "Categoria para testar os lançamentos",
+  "tipo": "RECEITA"
+}
+
+> {%
+    client.test("Categoria de receita criada: 201", function () {
+        client.assert(response.status === 201, "Esperado 201, recebido " + response.status);
+    });
+    if (response.status === 201) {
+        client.global.set("categoriaReceitaId", response.body.id);
+    }
+%}
+
+### 00B — Preparação: criar categoria de DESPESA (201)
+POST {{baseUrl}}/api/categorias
+Content-Type: application/json
+Accept: application/json
+
+{
+  "nome": "Despesa Teste {{$uuid}}",
+  "descricao": "Categoria para testar exclusão de lançamento pendente",
+  "tipo": "DESPESA"
+}
+
+> {%
+    client.test("Categoria de despesa criada: 201", function () {
+        client.assert(response.status === 201, "Esperado 201, recebido " + response.status);
+    });
+    if (response.status === 201) {
+        client.global.set("categoriaDespesaId", response.body.id);
+    }
+%}
+
+### 01 — Cadastrar lançamento válido (201)
+POST {{baseUrl}}/api/lancamentos
+Content-Type: application/json
+Accept: application/json
+
+{
+  "categoriaId": {{categoriaReceitaId}},
+  "descricao": "Venda de equipamento de raio-X",
+  "nomeContraparte": "Hospital São Lucas",
+  "valor": 125000.00,
+  "tipoLancamento": "RECEITA",
+  "dataVencimento": "2026-11-30"
+}
+
+> {%
+    client.test("Cadastro de lançamento: 201 e PENDENTE", function () {
+        client.assert(response.status === 201, "Esperado 201, recebido " + response.status);
+        client.assert(response.body.situacaoLancamento === "PENDENTE", "Esperado PENDENTE");
+    });
+    if (response.status === 201) {
+        client.global.set("lancamentoReceitaId", response.body.id);
+    }
+%}
+
+### 02 — Consultar lançamento por ID (200)
+GET {{baseUrl}}/api/lancamentos/{{lancamentoReceitaId}}
+Accept: application/json
+
+> {%
+    client.test("Consulta por ID: 200", function () {
+        client.assert(response.status === 200, "Esperado 200, recebido " + response.status);
+    });
+%}
+
+### 03 — Listar lançamentos paginados (200)
+GET {{baseUrl}}/api/lancamentos?page=0&size=10
+Accept: application/json
+
+> {%
+    client.test("Listagem paginada: 200", function () {
+        client.assert(response.status === 200, "Esperado 200, recebido " + response.status);
+        client.assert(Array.isArray(response.body.content), "Resposta não contém content como lista");
+    });
+%}
+
+### 04 — Atualizar lançamento pendente (200)
+PUT {{baseUrl}}/api/lancamentos/{{lancamentoReceitaId}}
+Content-Type: application/json
+Accept: application/json
+
+{
+  "categoriaId": {{categoriaReceitaId}},
+  "descricao": "Venda de equipamento de raio-X — atualizado",
+  "nomeContraparte": "Hospital São Lucas",
+  "valor": 130000.00,
+  "tipoLancamento": "RECEITA",
+  "dataVencimento": "2026-12-05"
+}
+
+> {%
+    client.test("Atualização de pendente: 200", function () {
+        client.assert(response.status === 200, "Esperado 200, recebido " + response.status);
+        client.assert(response.body.descricao === "Venda de equipamento de raio-X — atualizado", "Descrição não atualizada");
+    });
+%}
+
+### 05 — Rejeitar categoria incompatível (400)
+# categoria de RECEITA + lançamento do tipo DESPESA
+POST {{baseUrl}}/api/lancamentos
+Content-Type: application/json
+Accept: application/json
+
+{
+  "categoriaId": {{categoriaReceitaId}},
+  "descricao": "Lançamento com categoria incompatível",
+  "nomeContraparte": null,
+  "valor": 150.00,
+  "tipoLancamento": "DESPESA",
+  "dataVencimento": "2026-11-30"
+}
+
+> {%
+    client.test("Categoria incompatível: 400", function () {
+        client.assert(response.status === 400, "Esperado 400, recebido " + response.status);
+    });
+%}
+
+### 06 — Liquidar lançamento pendente (200)
+# Data fixa no passado/hoje (válida a partir de 18/11/2026)
+PATCH {{baseUrl}}/api/lancamentos/{{lancamentoReceitaId}}/liquidar
+Content-Type: application/json
+Accept: application/json
+
+{
+  "dataLiquidacao": "2026-11-18"
+}
+
+> {%
+    client.test("Liquidação: 200 e LIQUIDADO", function () {
+        client.assert(response.status === 200, "Esperado 200, recebido " + response.status);
+        client.assert(response.body.situacaoLancamento === "LIQUIDADO", "Esperado LIQUIDADO");
+        client.assert(response.body.dataLiquidacao === "2026-11-18", "Data de liquidação incorreta");
+    });
+%}
+
+### 07 — Impedir segunda liquidação (409)
+PATCH {{baseUrl}}/api/lancamentos/{{lancamentoReceitaId}}/liquidar
+Content-Type: application/json
+Accept: application/json
+
+{
+  "dataLiquidacao": "2026-11-18"
+}
+
+> {%
+    client.test("Segunda liquidação rejeitada: 409", function () {
+        client.assert(response.status === 409, "Esperado 409, recebido " + response.status);
+    });
+%}
+
+### 08 — Impedir exclusão de lançamento liquidado (409)
+DELETE {{baseUrl}}/api/lancamentos/{{lancamentoReceitaId}}
+Accept: application/json
+
+> {%
+    client.test("Excluir liquidado rejeitado: 409", function () {
+        client.assert(response.status === 409, "Esperado 409, recebido " + response.status);
+    });
+%}
+
+### 09 — Preparação para DELETE: criar lançamento pendente (201)
+POST {{baseUrl}}/api/lancamentos
+Content-Type: application/json
+Accept: application/json
+
+{
+  "categoriaId": {{categoriaDespesaId}},
+  "descricao": "Compra de componentes para estoque",
+  "nomeContraparte": "Fornecedor de peças",
+  "valor": 3200.00,
+  "tipoLancamento": "DESPESA",
+  "dataVencimento": "2026-12-15"
+}
+
+> {%
+    client.test("Lançamento pendente para exclusão: 201", function () {
+        client.assert(response.status === 201, "Esperado 201, recebido " + response.status);
+    });
+    if (response.status === 201) {
+        client.global.set("lancamentoDespesaId", response.body.id);
+    }
+%}
+
+### 10 — Excluir lançamento pendente (204)
+DELETE {{baseUrl}}/api/lancamentos/{{lancamentoDespesaId}}
+
+> {%
+    client.test("Excluir pendente: 204", function () {
+        client.assert(response.status === 204, "Esperado 204, recebido " + response.status);
+    });
+%}
+
+### 11 — Confirmar que o lançamento foi excluído (404)
+GET {{baseUrl}}/api/lancamentos/{{lancamentoDespesaId}}
+Accept: application/json
+
+> {%
+    client.test("Consultar excluído: 404", function () {
+        client.assert(response.status === 404, "Esperado 404, recebido " + response.status);
+    });
+%}
+
+### 12 — EXTRA: valor financeiro inválido (400)
+POST {{baseUrl}}/api/lancamentos
+Content-Type: application/json
+Accept: application/json
+
+{
+  "categoriaId": {{categoriaReceitaId}},
+  "descricao": "Lançamento com valor inválido",
+  "nomeContraparte": null,
+  "valor": -100.00,
+  "tipoLancamento": "RECEITA",
+  "dataVencimento": "2026-11-30"
+}
+
+> {%
+    client.test("Valor negativo: 400", function () {
+        client.assert(response.status === 400, "Esperado 400, recebido " + response.status);
+    });
+%}
+
+### 13 — EXTRA: lançamento inexistente (404)
+GET {{baseUrl}}/api/lancamentos/999999999
+Accept: application/json
+
+> {%
+    client.test("Lançamento inexistente: 404", function () {
+        client.assert(response.status === 404, "Esperado 404, recebido " + response.status);
+    });
+%}
