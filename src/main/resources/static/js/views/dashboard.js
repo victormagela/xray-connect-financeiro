@@ -35,7 +35,7 @@ function fimMesDaData(data) {
 export function renderDashboard() {
   return `
     <div class="dashboard-toolbar">
-      <p>Resumo dos lançamentos registrados. Os indicadores são atualizados a partir do MySQL.</p>
+      <p>Resumo dos lançamentos registrados.</p>
       <button class="button dashboard-refresh" type="button" data-dashboard-refresh>
         Atualizar dados
       </button>
