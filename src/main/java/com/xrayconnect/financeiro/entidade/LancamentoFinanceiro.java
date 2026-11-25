@@ -36,6 +36,9 @@ public class LancamentoFinanceiro {
     @Column(name = "valor", nullable = false, precision = 15, scale = 2)
     private BigDecimal valor;
 
+    @Column(name = "valor_liquidado", precision = 15, scale = 2)
+    private BigDecimal valorLiquidado;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "tipo", nullable = false, length = 10)
     private TipoLancamento tipoLancamento;
@@ -91,23 +94,34 @@ public class LancamentoFinanceiro {
     @PreUpdate
     private void aoAtualizar() {this.atualizadoEm = LocalDateTime.now(ZoneOffset.UTC);}
 
-    public void liquidar(LocalDate dataLiquidacao) {
+    public void liquidar(LocalDate dataLiquidacao, BigDecimal valorLiquidado) {
         if (dataLiquidacao == null) {
             throw new IllegalArgumentException("Data de liquidação não informada!");
         }
 
         if (this.situacaoLancamento != SituacaoLancamento.PENDENTE) {
             throw new ConflitoNegocioException(
-                "Lançamento não está pendente. Apenas lançamentos pendentes podem ser liquidados"
+                "Lançamento não está pendente. Apenas lançamentos pendentes podem ser liquidados."
             );
         }
 
         if (dataLiquidacao.isAfter(LocalDate.now())) {
-            throw new IllegalArgumentException("Data de liquidação não pode ser futura");
+            throw new IllegalArgumentException("Data de liquidação não pode ser futura.");
+        }
+
+        if (valorLiquidado == null || valorLiquidado.signum() <= 0) {
+            throw new IllegalArgumentException("O valor liquidado deve ser maior que 0.");
+        }
+
+        if (valorLiquidado.scale() > 2 ||
+            valorLiquidado.precision() - valorLiquidado.scale() > 13
+        ) {
+            throw new IllegalArgumentException("O valor liquidado deve respeitar DECIMAL(15,2).");
         }
 
         this.situacaoLancamento = SituacaoLancamento.LIQUIDADO;
         this.dataLiquidacao = dataLiquidacao;
+        this.valorLiquidado = valorLiquidado;
     }
 
     public boolean estaVencida(LocalDate dataReferencia) {
