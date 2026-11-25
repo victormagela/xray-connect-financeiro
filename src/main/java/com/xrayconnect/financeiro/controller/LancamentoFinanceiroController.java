@@ -51,6 +51,6 @@ public class LancamentoFinanceiroController {
 
     @PatchMapping("/{id}/liquidar")
     public LancamentoFinanceiroResponse patchLancamento(@PathVariable Long id, @RequestBody @Valid LiquidacaoRequest dados) {
-        return lancamentoFinanceiroService.liquidarLancamento(id, dados.dataLiquidacao());
+        return lancamentoFinanceiroService.liquidarLancamento(id, dados.dataLiquidacao(), dados.valorLiquidado());
     }
 }
