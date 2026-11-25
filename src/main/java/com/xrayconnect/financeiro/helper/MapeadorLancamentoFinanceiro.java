@@ -17,7 +17,8 @@ public class MapeadorLancamentoFinanceiro {
                 lancamento.getDataVencimento(),
                 lancamento.getDataLiquidacao(),
                 lancamento.getCriadoEm(),
-                lancamento.getAtualizadoEm()
+                lancamento.getAtualizadoEm(),
+                lancamento.getValorLiquidado()
         );
     }
 }

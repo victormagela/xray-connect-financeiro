@@ -19,6 +19,7 @@ public record LancamentoFinanceiroResponse(
         LocalDate dataVencimento,
         LocalDate dataLiquidacao,
         LocalDateTime criadoEm,
-        LocalDateTime atualizadoEm
+        LocalDateTime atualizadoEm,
+        BigDecimal valorLiquidado
 ) {
 }
