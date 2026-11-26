@@ -1,7 +1,7 @@
 /**
  * Fluxo de Caixa — X-Ray Connect.
- * Exibe somente lançamentos LIQUIDADOS, agrupados pela data de liquidação.
- * Os cálculos financeiros são realizados no Spring Boot; esta view só apresenta.
+ * Permite alternar entre movimentações realizadas (data de liquidação e valor efetivo)
+ * e projetadas (data de vencimento e valor previsto). O back-end faz os cálculos.
  */
 import api from '../api.js';
 import { formatarMoeda, formatarMes, formatarData, mensagemDeErro, escaparHtml,
@@ -26,17 +26,23 @@ export function renderFluxoCaixa() {
     <div class="fc-page">
       <div class="lf-toolbar">
         <div>
-          <p class="lf-eyebrow">RELATÓRIO FINANCEIRO · REGIME DE CAIXA</p>
-          <p class="lf-toolbar-description">Analise os valores efetivamente recebidos e pagos no período selecionado.</p>
+          <p class="lf-eyebrow" data-fc-mode-eyebrow>RELATÓRIO FINANCEIRO · REALIZADO</p>
+          <p class="lf-toolbar-description" data-fc-intro>Analise os valores efetivamente recebidos e pagos no período selecionado.</p>
         </div>
         <button type="button" class="button" data-fc-refresh>Atualizar dados</button>
       </div>
+
+      <fieldset class="fc-mode-switch" aria-label="Modalidade do fluxo de caixa">
+        <legend>Tipo de fluxo</legend>
+        <label class="fc-mode-choice"><input type="radio" name="fcModo" value="realizado" checked> <span>Realizado</span></label>
+        <label class="fc-mode-choice"><input type="radio" name="fcModo" value="projetado"> <span>Projetado</span></label>
+      </fieldset>
 
       <section class="panel fc-filters" aria-label="Filtros do fluxo de caixa">
         <div class="panel-header">
           <div>
             <h2 class="panel-title">Selecionar período</h2>
-            <p class="panel-subtitle">As datas são inclusivas e consideram a liquidação dos lançamentos.</p>
+            <p class="panel-subtitle" data-fc-dates-info>As datas são inclusivas e consideram a liquidação dos lançamentos.</p>
           </div>
         </div>
         <div class="panel-content">
@@ -64,19 +70,19 @@ export function renderFluxoCaixa() {
 
       <section class="metric-grid fc-metrics" aria-label="Totais do período">
         <article class="metric-card">
-          <div class="metric-label">Receitas realizadas</div>
+          <div class="metric-label" data-fc-receitas-label>Receitas realizadas</div>
           <div class="metric-number" data-fc-valor="totalReceitas">—</div>
-          <p class="metric-note">Valores recebidos dentro do período</p>
+          <p class="metric-note" data-fc-receitas-note>Valores recebidos dentro do período</p>
         </article>
         <article class="metric-card accent">
-          <div class="metric-label">Despesas realizadas</div>
+          <div class="metric-label" data-fc-despesas-label>Despesas realizadas</div>
           <div class="metric-number" data-fc-valor="totalDespesas">—</div>
-          <p class="metric-note">Valores pagos dentro do período</p>
+          <p class="metric-note" data-fc-despesas-note>Valores pagos dentro do período</p>
         </article>
         <article class="metric-card">
           <div class="metric-label">Saldo do período</div>
           <div class="metric-number" data-fc-valor="saldoPeriodo">—</div>
-          <p class="metric-note">Recebimentos menos pagamentos</p>
+          <p class="metric-note" data-fc-saldo-note>Recebimentos menos pagamentos</p>
         </article>
       </section>
 
@@ -84,7 +90,7 @@ export function renderFluxoCaixa() {
         <div class="panel-header fc-panel-header">
           <div>
             <h2 class="panel-title">Receitas × despesas</h2>
-            <p class="panel-subtitle">Comparativo mensal das movimentações liquidadas</p>
+            <p class="panel-subtitle" data-fc-chart-info>Comparativo mensal das movimentações liquidadas</p>
           </div>
           <span class="pill" data-fc-periodo>—</span>
         </div>
@@ -103,7 +109,7 @@ export function renderFluxoCaixa() {
         <div class="panel-header fc-panel-header">
           <div>
             <h2 class="panel-title">Detalhamento mensal</h2>
-            <p class="panel-subtitle">Resumo dos valores realizados em cada mês</p>
+            <p class="panel-subtitle" data-fc-table-info>Resumo dos valores realizados em cada mês</p>
           </div>
           <span class="pill" data-fc-meses>—</span>
         </div>
@@ -124,12 +130,12 @@ export function renderFluxoCaixa() {
         </div>
       </section>
 
-      <p class="lf-footnote">Este relatório considera somente lançamentos <strong>LIQUIDADOS</strong>, na respectiva data de liquidação. O saldo calculado não equivale necessariamente ao saldo bancário, pois não inclui saldo inicial ou conciliação.</p>
+      <p class="lf-footnote" data-fc-footnote>Este relatório considera somente lançamentos LIQUIDADOS, na respectiva data de liquidação. O saldo calculado não equivale necessariamente ao saldo bancário, pois não inclui saldo inicial ou conciliação.</p>
     </div>
   `;
 }
 
-function montarGrafico(meses) {
+function montarGrafico(meses, modo) {
   if (!Array.isArray(meses)) throw new Error('O servidor retornou um gráfico em formato inesperado.');
   const valores = meses.flatMap(mes => [Number(mes.receitas), Number(mes.despesas)]);
   const maior = Math.max(0, ...valores.filter(Number.isFinite));
@@ -137,7 +143,7 @@ function montarGrafico(meses) {
   if (meses.length === 0 || maior === 0) {
     return `<div class="dashboard-empty">
       <strong>Sem movimentações no período</strong>
-      <p>Não há receitas ou despesas liquidadas entre as datas selecionadas.</p>
+      <p>Não há receitas ou despesas ${modo === 'projetado' ? 'pendentes com vencimento' : 'liquidadas'} entre as datas selecionadas.</p>
     </div>`;
   }
 
@@ -203,6 +209,43 @@ export function inicializarFluxoCaixa(container) {
   };
   let ultimaConsulta = 0;
 
+  function modoAtual() {
+    return container.querySelector('input[name="fcModo"]:checked')?.value || 'realizado';
+  }
+
+  function atualizarTextosModo() {
+    const projetado = modoAtual() === 'projetado';
+    const textos = projetado ? {
+      'mode-eyebrow': 'RELATÓRIO FINANCEIRO · PROJETADO',
+      intro: 'Visualize valores ainda previstos para receber e pagar conforme a data de vencimento.',
+      'dates-info': 'As datas são inclusivas e consideram o vencimento de contas pendentes.',
+      'receitas-label': 'Receitas previstas',
+      'receitas-note': 'Valores pendentes a receber no período',
+      'despesas-label': 'Despesas previstas',
+      'despesas-note': 'Valores pendentes a pagar no período',
+      'saldo-note': 'Receitas previstas menos despesas previstas',
+      'chart-info': 'Comparativo mensal dos lançamentos pendentes por vencimento',
+      'table-info': 'Resumo dos valores previstos em cada mês',
+      footnote: 'O fluxo projetado inclui somente lançamentos PENDENTES pela data de vencimento, inclusive vencidos dentro do período. Não representa o saldo bancário futuro e não considera lançamentos já liquidados.',
+    } : {
+      'mode-eyebrow': 'RELATÓRIO FINANCEIRO · REALIZADO',
+      intro: 'Analise os valores efetivamente recebidos e pagos no período selecionado.',
+      'dates-info': 'As datas são inclusivas e consideram a liquidação dos lançamentos.',
+      'receitas-label': 'Receitas realizadas',
+      'receitas-note': 'Valores recebidos dentro do período',
+      'despesas-label': 'Despesas realizadas',
+      'despesas-note': 'Valores pagos dentro do período',
+      'saldo-note': 'Recebimentos menos pagamentos',
+      'chart-info': 'Comparativo mensal das movimentações liquidadas',
+      'table-info': 'Resumo dos valores realizados em cada mês',
+      footnote: 'Este relatório considera somente lançamentos LIQUIDADOS, na respectiva data de liquidação, utilizando o valor efetivo. O saldo não equivale necessariamente ao saldo bancário, pois não inclui saldo inicial ou conciliação.',
+    };
+    for (const [chave, texto] of Object.entries(textos)) {
+      const elemento = container.querySelector(`[data-fc-${chave}]`);
+      if (elemento) elemento.textContent = texto;
+    }
+  }
+
   function mostrarErro(mensagem) {
     elementos.feedback.hidden = false;
     elementos.feedback.textContent = mensagem;
@@ -230,7 +273,7 @@ export function inicializarFluxoCaixa(container) {
     }
 
     // Calcula apenas alturas visuais das barras. Totais monetários vêm da API.
-    const htmlGrafico = montarGrafico(dados.meses);
+    const htmlGrafico = montarGrafico(dados.meses, modoAtual());
     const htmlLinhas = montarLinhasMensais(dados.meses);
 
     for (const campo of ['totalReceitas', 'totalDespesas', 'saldoPeriodo']) {
@@ -247,6 +290,8 @@ export function inicializarFluxoCaixa(container) {
   async function consultar() {
     const inicio = elementos.inicio.value;
     const fim = elementos.fim.value;
+    // Invalida resultados de consultas anteriores mesmo que o novo período seja inválido.
+    const consultaAtual = ++ultimaConsulta;
     limparErro();
 
     if (!inicio || !fim) {
@@ -267,14 +312,15 @@ export function inicializarFluxoCaixa(container) {
       return;
     }
 
-    const consultaAtual = ++ultimaConsulta;
     elementos.aplicar.disabled = true;
     elementos.atualizar.disabled = true;
     elementos.aplicar.textContent = 'Consultando...';
     redefinirResultado();
 
     try {
-      const dados = await api.relatorios.fluxoCaixa(inicio, fim);
+      const dados = modoAtual() === 'projetado'
+        ? await api.relatorios.fluxoCaixaProjetado(inicio, fim)
+        : await api.relatorios.fluxoCaixa(inicio, fim);
       if (!container.isConnected || consultaAtual !== ultimaConsulta) return;
       exibirResultado(dados);
     } catch (erro) {
@@ -314,6 +360,12 @@ export function inicializarFluxoCaixa(container) {
     consultar();
   });
   elementos.atualizar.addEventListener('click', consultar);
+  container.querySelectorAll('input[name="fcModo"]').forEach(campo => {
+    campo.addEventListener('change', () => {
+      atualizarTextosModo();
+      consultar();
+    });
+  });
   container.querySelectorAll('[data-fc-preset]').forEach(botao => {
     botao.addEventListener('click', () => aplicarAtalho(botao.dataset.fcPreset));
   });
@@ -321,5 +373,6 @@ export function inicializarFluxoCaixa(container) {
   const periodoInicial = periodoUltimosMeses();
   elementos.inicio.value = periodoInicial.inicio;
   elementos.fim.value = periodoInicial.fim;
+  atualizarTextosModo();
   consultar();
 }

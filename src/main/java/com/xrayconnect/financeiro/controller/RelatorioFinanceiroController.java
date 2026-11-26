@@ -34,4 +34,17 @@ public class RelatorioFinanceiroController {
     ) {
         return servico.obterFluxoCaixa(inicio, fim);
     }
+
+    @GetMapping("/fluxo-caixa/projetado")
+    public FluxoCaixaResponse obterFluxoCaixaProjetado(
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate inicio,
+
+            @RequestParam
+            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)
+            LocalDate fim
+    ) {
+        return servico.obterFluxoCaixaProjetado(inicio, fim);
+    }
 }

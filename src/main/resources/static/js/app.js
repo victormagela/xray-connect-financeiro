@@ -8,7 +8,7 @@ const rotas = {
   dashboard: { titulo: 'Dashboard financeiro', kicker: 'VISÃO GERAL', descricao: 'Acompanhe os principais indicadores financeiros da X-Ray Connect.', render: renderDashboard, inicializar: inicializarDashboard },
   receber: { titulo: 'Contas a receber', kicker: 'GESTÃO DE RECEITAS', descricao: 'Gerencie vendas e outros valores que a empresa tem a receber.', render: () => renderLancamentos('RECEITA'), inicializar: conteudo => inicializarLancamentos(conteudo, 'RECEITA') },
   pagar: { titulo: 'Contas a pagar', kicker: 'GESTÃO DE DESPESAS', descricao: 'Acompanhe as obrigações e os pagamentos da empresa.', render: () => renderLancamentos('DESPESA'), inicializar: conteudo => inicializarLancamentos(conteudo, 'DESPESA') },
-  'fluxo-caixa': { titulo: 'Fluxo de caixa', kicker: 'RELATÓRIOS', descricao: 'Consulte as entradas, saídas e o saldo realizado por período.', render: renderFluxoCaixa, inicializar: inicializarFluxoCaixa },
+  'fluxo-caixa': { titulo: 'Fluxo de caixa', kicker: 'RELATÓRIOS', descricao: 'Consulte entradas, saídas e saldos realizados ou projetados por período.', render: renderFluxoCaixa, inicializar: inicializarFluxoCaixa },
   categorias: { titulo: 'Categorias', kicker: 'CONFIGURAÇÕES', descricao: 'Organize e classifique os lançamentos financeiros.', render: renderCategorias, inicializar: inicializarCategorias },
 };
 

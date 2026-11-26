@@ -162,6 +162,12 @@ export function renderLancamentos(tipo) {
               <input id="lf-data-liquidacao-${tipo}" type="date" name="dataLiquidacao" required />
               <small class="lf-field-error" data-lf-field-error="dataLiquidacao" hidden></small>
             </div>
+            <div class="lf-field">
+              <label for="lf-valor-liquidado-${tipo}">Valor efetivamente ${tipo === 'RECEITA' ? 'recebido' : 'pago'} (R$) <span aria-hidden="true">*</span></label>
+              <input id="lf-valor-liquidado-${tipo}" type="number" name="valorLiquidado" min="0.01" step="0.01" inputmode="decimal" required />
+              <small class="lf-field-error" data-lf-field-error="valorLiquidado" hidden></small>
+              <p class="lf-help">O valor é preenchido com o previsto; você pode alterar para registrar juros ou desconto.</p>
+            </div>
             <p class="lf-help">A data não pode ser futura. Após a liquidação, a conta não poderá ser editada ou excluída.</p>
           </div>
           <div class="lf-dialog-actions">
@@ -195,7 +201,10 @@ function linhaLancamento(lancamento) {
     <td><strong class="lf-description">${escaparHtml(lancamento.descricao || '—')}</strong>
       <span class="lf-secondary">${escaparHtml(lancamento.nomeContraparte || 'Sem contraparte')}</span></td>
     <td>${escaparHtml(lancamento.categoriaNome || `Categoria #${lancamento.categoriaId ?? '?'}`)}</td>
-    <td class="lf-amount">${escaparHtml(formatarMoeda(lancamento.valor))}</td>
+    <td class="lf-amount">${escaparHtml(formatarMoeda(lancamento.valor))}
+      ${!pendente && lancamento.valorLiquidado != null
+        ? `<span class="lf-secondary">Efetivo: ${escaparHtml(formatarMoeda(lancamento.valorLiquidado))}</span>`
+        : ''}</td>
     <td>${escaparHtml(formatarData(lancamento.dataVencimento))}</td>
     <td><span class="lf-status lf-status-${classe}">${escaparHtml(situacao)}</span>
       ${!pendente && lancamento.dataLiquidacao ? `<span class="lf-secondary">${escaparHtml(formatarData(lancamento.dataLiquidacao))}</span>` : ''}</td>
@@ -418,6 +427,8 @@ export function inicializarLancamentos(container, tipo) {
     const campo = elementos.formularioLiquidacao.elements.dataLiquidacao;
     campo.max = dataAtualISO();
     campo.value = dataAtualISO();
+    // Usa o valor previsto como padrão, sem impedir descontos ou acréscimos.
+    elementos.formularioLiquidacao.elements.valorLiquidado.value = lancamento.valor ?? '';
     $('[data-lf-settlement-description]').textContent =
       `${lancamento.descricao} — ${formatarMoeda(lancamento.valor)}.`;
     elementos.liquidacao.showModal();
@@ -434,6 +445,7 @@ export function inicializarLancamentos(container, tipo) {
       await api.lancamentos.liquidar(
         idEmLiquidacao,
         elementos.formularioLiquidacao.elements.dataLiquidacao.value,
+        elementos.formularioLiquidacao.elements.valorLiquidado.value,
       );
       if (!container.isConnected) return;
       elementos.liquidacao.close();

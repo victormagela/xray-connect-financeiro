@@ -129,9 +129,9 @@ const api = {
     excluir(id) {
       return apiFetch(`/api/lancamentos/${encodeURIComponent(id)}`, { method: 'DELETE' });
     },
-    liquidar(id, dataLiquidacao) {
+    liquidar(id, dataLiquidacao, valorLiquidado) {
       return apiFetch(`/api/lancamentos/${encodeURIComponent(id)}/liquidar`, {
-        method: 'PATCH', body: { dataLiquidacao },
+        method: 'PATCH', body: { dataLiquidacao, valorLiquidado },
       });
     },
   },
@@ -142,6 +142,9 @@ const api = {
     },
     fluxoCaixa(inicio, fim) {
       return apiFetch(comParametros('/api/relatorios/fluxo-caixa', { inicio, fim }));
+    },
+    fluxoCaixaProjetado(inicio, fim) {
+      return apiFetch(comParametros('/api/relatorios/fluxo-caixa/projetado', { inicio, fim }));
     },
   },
 };
