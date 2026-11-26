@@ -266,3 +266,13 @@ Accept: application/json
 ### Listar receitas ordenadas por vencimento
 GET http://localhost:8080/api/lancamentos?tipo=RECEITA&page=0&size=10&sort=dataVencimento,asc
 Accept: application/json
+
+
+### Liquidar lançamento com juros
+PATCH http://localhost:8080/api/lancamentos/1/liquidar
+Content-Type: application/json
+
+{
+  "dataLiquidacao": "2026-11-25",
+  "valorLiquidado": 126000.00
+}
