@@ -73,6 +73,35 @@ public class RelatorioFinanceiroService {
             LocalDate inicio,
             LocalDate fim
     ) {
+        validarPeriodo(inicio, fim);
+
+        var movimentacoes = repositorio.somarMovimentacoesPorDia(
+                SituacaoLancamento.LIQUIDADO,
+                inicio,
+                fim
+        );
+
+        return montarFluxoCaixa(inicio, fim, movimentacoes);
+    }
+
+    @Transactional(readOnly = true)
+    public FluxoCaixaResponse obterFluxoCaixaProjetado(
+            LocalDate inicio,
+            LocalDate fim
+    ) {
+        validarPeriodo(inicio, fim);
+
+        var movimentacoes = repositorio.somarMovimentacoesProjetadasPorDia(
+                SituacaoLancamento.PENDENTE,
+                inicio,
+                fim
+        );
+
+        return montarFluxoCaixa(inicio, fim, movimentacoes);
+    }
+
+    private void validarPeriodo(LocalDate inicio, LocalDate fim) {
+
         if (inicio == null || fim == null) {
             throw new IllegalArgumentException(
                     "O período inicial e final deve ser informado."
@@ -84,26 +113,31 @@ public class RelatorioFinanceiroService {
                     "A data inicial não pode ser posterior à data final."
             );
         }
+    }
 
-        var movimentacoes = repositorio.somarMovimentacoesPorDia(
-                SituacaoLancamento.LIQUIDADO,
-                inicio,
-                fim
-        );
+    private FluxoCaixaResponse montarFluxoCaixa(
+            LocalDate inicio,
+            LocalDate fim,
+            List<MovimentacaoDiaria> movimentacoes
+    ) {
 
         Map<YearMonth, BigDecimal> receitasPorMes = new HashMap<>();
         Map<YearMonth, BigDecimal> despesasPorMes = new HashMap<>();
 
         for (var movimentacao : movimentacoes) {
+
             YearMonth mes = YearMonth.from(movimentacao.data());
 
             if (movimentacao.tipo() == TipoLancamento.RECEITA) {
+
                 receitasPorMes.merge(
                         mes,
                         movimentacao.total(),
                         BigDecimal::add
                 );
+
             } else {
+
                 despesasPorMes.merge(
                         mes,
                         movimentacao.total(),
