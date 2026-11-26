@@ -95,7 +95,7 @@ public class RelatorioFinanceiroService {
         Map<YearMonth, BigDecimal> despesasPorMes = new HashMap<>();
 
         for (var movimentacao : movimentacoes) {
-            YearMonth mes = YearMonth.from(movimentacao.dataLiquidacao());
+            YearMonth mes = YearMonth.from(movimentacao.data());
 
             if (movimentacao.tipo() == TipoLancamento.RECEITA) {
                 receitasPorMes.merge(

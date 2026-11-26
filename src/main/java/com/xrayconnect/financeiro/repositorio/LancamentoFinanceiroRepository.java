@@ -27,7 +27,7 @@ public interface LancamentoFinanceiroRepository extends JpaRepository<Lancamento
             SELECT new com.xrayconnect.financeiro.dto.TotalPorTipoESituacao(
                 l.tipoLancamento,
                 l.situacaoLancamento,
-                SUM(l.valor)
+                SUM(CAST(COALESCE(l.valorLiquidado, l.valor) AS BIGDECIMAL ))
             )
             FROM LancamentoFinanceiro l
             GROUP BY l.tipoLancamento, l.situacaoLancamento
@@ -49,7 +49,7 @@ public interface LancamentoFinanceiroRepository extends JpaRepository<Lancamento
             SELECT new com.xrayconnect.financeiro.dto.MovimentacaoDiaria(
                 l.dataLiquidacao,
                 l.tipoLancamento,
-                SUM(l.valor)
+                SUM(l.valorLiquidado)
             )
             FROM LancamentoFinanceiro l
             WHERE l.situacaoLancamento = :situacao
@@ -58,6 +58,24 @@ public interface LancamentoFinanceiroRepository extends JpaRepository<Lancamento
             ORDER BY l.dataLiquidacao
             """)
     List<MovimentacaoDiaria> somarMovimentacoesPorDia(
+            @Param("situacao") SituacaoLancamento situacao,
+            @Param("inicio") LocalDate inicio,
+            @Param("fim") LocalDate fim
+    );
+
+    @Query("""
+        SELECT new com.xrayconnect.financeiro.dto.MovimentacaoDiaria(
+            l.dataVencimento,
+            l.tipoLancamento,
+            SUM(l.valor)
+        )
+        FROM LancamentoFinanceiro l
+        WHERE l.situacaoLancamento = :situacao
+          AND l.dataVencimento BETWEEN :inicio AND :fim
+        GROUP BY l.dataVencimento, l.tipoLancamento
+        ORDER BY l.dataVencimento
+        """)
+    List<MovimentacaoDiaria> somarMovimentacoesProjetadasPorDia(
             @Param("situacao") SituacaoLancamento situacao,
             @Param("inicio") LocalDate inicio,
             @Param("fim") LocalDate fim

@@ -6,7 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 public record MovimentacaoDiaria(
-        LocalDate dataLiquidacao,
+        LocalDate data,
         TipoLancamento tipo,
         BigDecimal total
 ) {
