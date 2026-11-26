@@ -124,7 +124,7 @@ public class LancamentoFinanceiroTest {
         var dataLiquidacao = LocalDate.now();
 
         //Act
-        lancamento.liquidar(dataLiquidacao);
+        lancamento.liquidar(dataLiquidacao, new BigDecimal("1000.00"));
 
         //Assert
         assertEquals(SituacaoLancamento.LIQUIDADO, lancamento.getSituacaoLancamento());
@@ -155,11 +155,11 @@ public class LancamentoFinanceiroTest {
 
         var dataLiquidacao = LocalDate.now();
 
-        lancamento.liquidar(dataLiquidacao);
+        lancamento.liquidar(dataLiquidacao, new BigDecimal("1000.00"));
 
         //Act & Assert
         assertThrows(IllegalStateException.class, () -> {
-            lancamento.liquidar(dataLiquidacao);
+            lancamento.liquidar(dataLiquidacao, new BigDecimal("1000.00"));
         });
         assertEquals(dataLiquidacao, lancamento.getDataLiquidacao());
         assertEquals(SituacaoLancamento.LIQUIDADO, lancamento.getSituacaoLancamento());
@@ -191,7 +191,7 @@ public class LancamentoFinanceiroTest {
 
         //Act & Assert
         assertThrows(IllegalArgumentException.class, () -> {
-           lancamento.liquidar(dataLiquidacao);
+           lancamento.liquidar(dataLiquidacao, new BigDecimal("1000.00"));
         });
         assertNull(lancamento.getDataLiquidacao());
         assertEquals(SituacaoLancamento.PENDENTE, lancamento.getSituacaoLancamento());
@@ -249,7 +249,7 @@ public class LancamentoFinanceiroTest {
                 tipo,
                 dataVencimento
         );
-        lancamento.liquidar(LocalDate.now());
+        lancamento.liquidar(LocalDate.now(), new BigDecimal("1000.00"));
 
         var dataReferencia = LocalDate.of(2026, 11, 30);
 
