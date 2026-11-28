@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 @Testcontainers
-@Transactional // Cada teste executa em sua própria transação, revertida ao terminar.
+@Transactional
 class LancamentoFinanceiroRepositoryIT {
 
     @Container
@@ -54,7 +54,7 @@ class LancamentoFinanceiroRepositoryIT {
         // Act
         var salvo = lancamentoRepository.save(lancamento);
         entityManager.flush();
-        entityManager.clear(); // Obriga a próxima leitura a consultar o banco.
+        entityManager.clear();
         var encontrado = lancamentoRepository.findById(salvo.getId()).orElseThrow();
 
         // Assert
